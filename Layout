@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arsenal Naval – Editor de Layout</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0d1b2e;
+    --navy2: #132540;
+    --gold: #c9a84c;
+    --gold2: #e8c96a;
+    --cream: #f5f0e8;
+    --panel: #1a2a40;
+    --border: #2e4060;
+    --text: #d4c9a8;
+    --red: #c0392b;
+    --green: #27ae60;
+  }
+
+- { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+background: var(–navy);
+font-family: ‘Crimson Text’, Georgia, serif;
+color: var(–text);
+height: 100vh;
+display: flex;
+flex-direction: column;
+overflow: hidden;
+user-select: none;
+}
+
+/* HEADER */
+header {
+background: var(–panel);
+border-bottom: 2px solid var(–gold);
+padding: 8px 16px;
+display: flex;
+align-items: center;
+gap: 16px;
+flex-shrink: 0;
+z-index: 10;
+}
+
+header h1 {
+font-family: ‘Cinzel’, serif;
+font-size: 14px;
+letter-spacing: 3px;
+color: var(–gold);
+text-transform: uppercase;
+white-space: nowrap;
+}
+
+header h1 span {
+color: var(–cream);
+font-weight: 400;
+}
+
+.header-sep { width: 1px; height: 28px; background: var(–border); }
+
+/* TOOLBAR */
+.toolbar {
+display: flex;
+align-items: center;
+gap: 4px;
+flex: 1;
+flex-wrap: wrap;
+}
+
+.tool-group {
+display: flex;
+align-items: center;
+gap: 2px;
+padding: 0 6px;
+border-right: 1px solid var(–border);
+}
+
+.tool-group:last-child { border-right: none; }
+
+.tool-btn {
+background: transparent;
+border: 1px solid transparent;
+color: var(–text);
+padding: 5px 9px;
+border-radius: 4px;
+cursor: pointer;
+font-size: 15px;
+transition: all 0.15s;
+display: flex;
+align-items: center;
+gap: 5px;
+font-family: ‘Crimson Text’, serif;
+white-space: nowrap;
+}
+
+.tool-btn:hover { background: var(–navy2); border-color: var(–border); }
+.tool-btn.active { background: var(–navy2); border-color: var(–gold); color: var(–gold2); }
+
+.tool-label { font-size: 11px; color: var(–text); opacity: 0.7; }
+
+/* COLOR PICKER inline */
+.color-swatch {
+width: 20px; height: 20px;
+border-radius: 50%;
+border: 2px solid var(–border);
+cursor: pointer;
+flex-shrink: 0;
+}
+
+input[type=color] {
+width: 0; height: 0; opacity: 0; position: absolute; pointer-events: none;
+}
+
+select.tool-select {
+background: var(–navy2);
+border: 1px solid var(–border);
+color: var(–text);
+padding: 4px 6px;
+border-radius: 4px;
+font-family: ‘Crimson Text’, serif;
+font-size: 13px;
+cursor: pointer;
+}
+
+input.size-input {
+width: 46px;
+background: var(–navy2);
+border: 1px solid var(–border);
+color: var(–text);
+padding: 4px 6px;
+border-radius: 4px;
+font-family: ‘Crimson Text’, serif;
+font-size: 13px;
+text-align: center;
+}
+
+/* MAIN AREA */
+.main {
+display: flex;
+flex: 1;
+overflow: hidden;
+}
+
+/* SIDE PANEL */
+.side-panel {
+width: 180px;
+background: var(–panel);
+border-right: 1px solid var(–border);
+display: flex;
+flex-direction: column;
+gap: 0;
+overflow-y: auto;
+flex-shrink: 0;
+}
+
+.side-section {
+padding: 10px 12px;
+border-bottom: 1px solid var(–border);
+}
+
+.side-title {
+font-family: ‘Cinzel’, serif;
+font-size: 9px;
+letter-spacing: 2px;
+color: var(–gold);
+text-transform: uppercase;
+margin-bottom: 8px;
+}
+
+.preset-btn {
+width: 100%;
+background: var(–navy2);
+border: 1px solid var(–border);
+color: var(–text);
+padding: 6px 8px;
+border-radius: 4px;
+cursor: pointer;
+font-family: ‘Crimson Text’, serif;
+font-size: 12px;
+margin-bottom: 4px;
+text-align: left;
+transition: all 0.15s;
+}
+
+.preset-btn:hover { border-color: var(–gold); color: var(–gold2); }
+
+/* Canvas area */
+.canvas-wrap {
+flex: 1;
+display: flex;
+align-items: center;
+justify-content: center;
+overflow: auto;
+background: repeating-linear-gradient(
+45deg,
+transparent,
+transparent 10px,
+rgba(255,255,255,0.015) 10px,
+rgba(255,255,255,0.015) 20px
+), var(–navy);
+padding: 24px;
+}
+
+canvas {
+background: white;
+box-shadow: 0 8px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(201,168,76,0.3);
+display: block;
+touch-action: none;
+}
+
+/* Status bar */
+.statusbar {
+background: var(–panel);
+border-top: 1px solid var(–border);
+padding: 4px 16px;
+font-size: 11px;
+color: var(–text);
+opacity: 0.6;
+display: flex;
+gap: 16px;
+flex-shrink: 0;
+}
+
+/* Text input overlay */
+#text-input-overlay {
+position: fixed;
+display: none;
+z-index: 1000;
+background: var(–panel);
+border: 2px solid var(–gold);
+border-radius: 6px;
+padding: 8px;
+gap: 6px;
+flex-direction: column;
+}
+
+#text-input-overlay input {
+background: var(–navy2);
+border: 1px solid var(–border);
+color: var(–cream);
+padding: 6px 10px;
+border-radius: 4px;
+font-family: ‘Crimson Text’, serif;
+font-size: 16px;
+width: 240px;
+}
+
+#text-input-overlay .btn-row {
+display: flex; gap: 6px; justify-content: flex-end;
+}
+
+#text-input-overlay button {
+background: var(–navy2);
+border: 1px solid var(–border);
+color: var(–text);
+padding: 5px 14px;
+border-radius: 4px;
+cursor: pointer;
+font-family: ‘Crimson Text’, serif;
+font-size: 13px;
+}
+
+#text-input-overlay button.ok {
+background: var(–gold);
+color: var(–navy);
+border-color: var(–gold2);
+font-weight: 600;
+}
+
+.layer-item {
+display: flex;
+align-items: center;
+gap: 6px;
+padding: 4px 8px;
+border-radius: 4px;
+cursor: pointer;
+font-size: 12px;
+transition: background 0.1s;
+}
+
+.layer-item:hover { background: var(–navy2); }
+.layer-item.selected { background: var(–navy2); border-left: 2px solid var(–gold); }
+.layer-icon { font-size: 11px; opacity: 0.7; }
+.layer-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.layer-del { opacity: 0; font-size: 12px; color: var(–red); cursor: pointer; }
+.layer-item:hover .layer-del { opacity: 1; }
+
+.prop-row { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+.prop-label { font-size: 11px; color: var(–text); opacity: 0.6; width: 50px; flex-shrink: 0; }
+.prop-input {
+flex: 1;
+background: var(–navy2);
+border: 1px solid var(–border);
+color: var(–text);
+padding: 3px 6px;
+border-radius: 3px;
+font-family: ‘Crimson Text’, serif;
+font-size: 12px;
+}
+
+.prop-color {
+width: 24px; height: 24px;
+border-radius: 4px;
+border: 1px solid var(–border);
+cursor: pointer;
+}
+
+.action-btn {
+width: 100%;
+background: transparent;
+border: 1px solid var(–border);
+color: var(–text);
+padding: 6px;
+border-radius: 4px;
+cursor: pointer;
+font-family: ‘Crimson Text’, serif;
+font-size: 12px;
+margin-bottom: 4px;
+transition: all 0.15s;
+}
+
+.action-btn:hover { border-color: var(–gold); color: var(–gold2); }
+.action-btn.danger:hover { border-color: var(–red); color: var(–red); }
+.action-btn.export { background: var(–gold); color: var(–navy); border-color: var(–gold2); font-weight: 600; }
+.action-btn.export:hover { background: var(–gold2); }
+
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(–navy); }
+::-webkit-scrollbar-thumb { background: var(–border); border-radius: 3px; }
+</style>
+
+</head>
+<body>
+
+<!-- TEXT INPUT OVERLAY -->
+
+<div id="text-input-overlay">
+  <input type="text" id="text-field" placeholder="Digite o texto..." />
+  <div class="btn-row">
+    <button onclick="cancelText()">Cancelar</button>
+    <button class="ok" onclick="confirmText()">Adicionar</button>
+  </div>
+</div>
+
+<header>
+  <h1>Arsenal Naval <span>/ Editor de Layout</span></h1>
+  <div class="header-sep"></div>
+
+  <div class="toolbar">
+    <!-- Tools -->
+    <div class="tool-group">
+      <span class="tool-label">Ferramenta:</span>
+      <button class="tool-btn active" id="tool-select" onclick="setTool('select')" title="Selecionar (V)">↖ Selecionar</button>
+      <button class="tool-btn" id="tool-rect" onclick="setTool('rect')" title="Retângulo (R)">▭ Retângulo</button>
+      <button class="tool-btn" id="tool-circle" onclick="setTool('circle')" title="Círculo (C)">◯ Círculo</button>
+      <button class="tool-btn" id="tool-line" onclick="setTool('line')" title="Linha (L)">╱ Linha</button>
+      <button class="tool-btn" id="tool-text" onclick="setTool('text')" title="Texto (T)">T Texto</button>
+    </div>
+
+```
+<!-- Fill -->
+<div class="tool-group">
+  <span class="tool-label">Preencher:</span>
+  <div class="color-swatch" id="fill-swatch" onclick="openPicker('fill')" title="Cor de fundo"></div>
+  <input type="color" id="fill-picker" value="#ffffff" onchange="updateFill(this.value)">
+  <button class="tool-btn" id="fill-none-btn" onclick="toggleFillNone()" title="Sem preenchimento">∅</button>
+</div>
+
+<!-- Stroke -->
+<div class="tool-group">
+  <span class="tool-label">Contorno:</span>
+  <div class="color-swatch" id="stroke-swatch" onclick="openPicker('stroke')" title="Cor do contorno"></div>
+  <input type="color" id="stroke-picker" value="#0d1b2e" onchange="updateStroke(this.value)">
+  <input class="size-input" type="number" id="stroke-width" value="2" min="0" max="20" title="Espessura">
+</div>
+
+<!-- Font -->
+<div class="tool-group">
+  <span class="tool-label">Fonte:</span>
+  <select class="tool-select" id="font-family">
+    <option value="Cinzel">Cinzel</option>
+    <option value="Crimson Text" selected>Crimson Text</option>
+    <option value="Georgia">Georgia</option>
+    <option value="Arial">Arial</option>
+    <option value="Courier New">Courier New</option>
+  </select>
+  <input class="size-input" type="number" id="font-size" value="18" min="6" max="120" title="Tamanho">
+</div>
+
+<!-- Canvas size -->
+<div class="tool-group">
+  <span class="tool-label">Canvas:</span>
+  <select class="tool-select" id="canvas-preset" onchange="applyCanvasPreset(this.value)">
+    <option value="custom">Personalizado</option>
+    <option value="a4p">A4 Retrato</option>
+    <option value="a4l">A4 Paisagem</option>
+    <option value="30x40">30×40cm</option>
+    <option value="40x50">40×50cm</option>
+    <option value="20x30">20×30cm</option>
+    <option value="sq30">Quadrado 30</option>
+  </select>
+</div>
+
+<!-- Actions -->
+<div class="tool-group">
+  <button class="tool-btn" onclick="undo()" title="Desfazer (Ctrl+Z)">↩ Desfazer</button>
+  <button class="tool-btn" onclick="clearCanvas()" title="Limpar">🗑 Limpar</button>
+  <button class="tool-btn" style="color:var(--gold2);border-color:var(--gold)" onclick="exportPNG()" title="Exportar PNG">⬇ Exportar PNG</button>
+</div>
+```
+
+  </div>
+</header>
+
+<div class="main">
+  <!-- SIDE PANEL -->
+  <div class="side-panel">
+
+```
+<!-- Layers -->
+<div class="side-section">
+  <div class="side-title">Camadas</div>
+  <div id="layers-list"></div>
+</div>
+
+<!-- Properties -->
+<div class="side-section" id="props-section" style="display:none">
+  <div class="side-title">Propriedades</div>
+  <div id="props-content"></div>
+</div>
+
+<!-- Presets -->
+<div class="side-section">
+  <div class="side-title">Elementos Navais</div>
+  <button class="preset-btn" onclick="addPreset('frame')">🖼 Quadro (bordas)</button>
+  <button class="preset-btn" onclick="addPreset('photo')">📷 Área de foto</button>
+  <button class="preset-btn" onclick="addPreset('badge')">🔵 Brasão (círculo)</button>
+  <button class="preset-btn" onclick="addPreset('title')">✏ Título do Legado</button>
+  <button class="preset-btn" onclick="addPreset('subtitle')">✏ Nome / Patente</button>
+  <button class="preset-btn" onclick="addPreset('dates')">✏ Período de Serviço</button>
+  <button class="preset-btn" onclick="addPreset('divider')">— Divisória</button>
+  <button class="preset-btn" onclick="addPreset('logo')">⚓ Texto Arsenal Naval</button>
+</div>
+
+<!-- Canvas Actions -->
+<div class="side-section">
+  <div class="side-title">Exportar</div>
+  <button class="action-btn export" onclick="exportPNG()">⬇ Salvar como PNG</button>
+  <button class="action-btn" onclick="shareLayout()">🔗 Copiar link (JSON)</button>
+</div>
+```
+
+  </div>
+
+  <!-- CANVAS -->
+
+  <div class="canvas-wrap" id="canvas-wrap">
+    <canvas id="cv"></canvas>
+  </div>
+</div>
+
+<div class="statusbar">
+  <span id="status-tool">Ferramenta: Selecionar</span>
+  <span id="status-pos">x: 0  y: 0</span>
+  <span id="status-size">Canvas: 595 × 842</span>
+  <span id="status-sel">Nenhum elemento selecionado</span>
+</div>
+
+<script>
+// ─── State ───────────────────────────────────────────────
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+let W = 595, H = 842;
+cv.width = W; cv.height = H;
+
+let tool = 'select';
+let shapes = [];
+let history = [];
+let selectedId = null;
+let drawing = false;
+let startX, startY;
+let textPending = null;
+
+// Current style
+let fillColor = '#ffffff';
+let fillNone = false;
+let strokeColor = '#0d1b2e';
+let strokeW = 2;
+let fontFamily = 'Crimson Text';
+let fontSize = 18;
+
+// Drag/resize state
+let dragging = false, resizing = false;
+let dragOffX, dragOffY, resizeHandle;
+const HANDLE_SIZE = 8;
+
+let idCounter = 1;
+
+// ─── Init ─────────────────────────────────────────────────
+updateSwatches();
+updateStatusBar();
+
+// ─── Canvas size presets ──────────────────────────────────
+function applyCanvasPreset(v) {
+  const presets = {
+    a4p: [595, 842], a4l: [842, 595],
+    '30x40': [567, 756], '40x50': [756, 945],
+    '20x30': [378, 567], sq30: [567, 567]
+  };
+  if (presets[v]) {
+    W = presets[v][0]; H = presets[v][1];
+    cv.width = W; cv.height = H;
+    document.getElementById('status-size').textContent = `Canvas: ${W} × ${H}`;
+    render();
+  }
+}
+
+// ─── Tools ───────────────────────────────────────────────
+function setTool(t) {
+  tool = t;
+  document.querySelectorAll('.tool-btn[id^=tool-]').forEach(b => b.classList.remove('active'));
+  document.getElementById('tool-' + t)?.classList.add('active');
+  cv.style.cursor = t === 'select' ? 'default' : 'crosshair';
+  document.getElementById('status-tool').textContent = 'Ferramenta: ' + ({
+    select:'Selecionar', rect:'Retângulo', circle:'Círculo',
+    line:'Linha', text:'Texto'
+  }[t] || t);
+}
+
+// ─── Color ────────────────────────────────────────────────
+function openPicker(type) {
+  const p = document.getElementById(type + '-picker');
+  p.style.position = 'absolute';
+  p.style.left = '-9999px';
+  document.body.appendChild(p);
+  p.click();
+}
+
+function updateFill(v) {
+  fillColor = v;
+  fillNone = false;
+  document.getElementById('fill-none-btn').classList.remove('active');
+  updateSwatches();
+  if (selectedId !== null) {
+    const s = shapes.find(x => x.id === selectedId);
+    if (s) { s.fill = v; s.fillNone = false; render(); updateLayers(); }
+  }
+}
+
+function updateStroke(v) {
+  strokeColor = v;
+  updateSwatches();
+  if (selectedId !== null) {
+    const s = shapes.find(x => x.id === selectedId);
+    if (s) { s.stroke = v; render(); }
+  }
+}
+
+function toggleFillNone() {
+  fillNone = !fillNone;
+  document.getElementById('fill-none-btn').classList.toggle('active', fillNone);
+  if (selectedId !== null) {
+    const s = shapes.find(x => x.id === selectedId);
+    if (s) { s.fillNone = fillNone; render(); }
+  }
+}
+
+function updateSwatches() {
+  document.getElementById('fill-swatch').style.background = fillNone ? 'transparent' : fillColor;
+  document.getElementById('fill-swatch').style.border = fillNone ? '2px dashed #888' : '2px solid var(--border)';
+  document.getElementById('stroke-swatch').style.background = strokeColor;
+  document.getElementById('fill-picker').value = fillColor;
+  document.getElementById('stroke-picker').value = strokeColor;
+}
+
+// ─── Mouse events ─────────────────────────────────────────
+cv.addEventListener('mousedown', onMouseDown);
+cv.addEventListener('mousemove', onMouseMove);
+cv.addEventListener('mouseup', onMouseUp);
+cv.addEventListener('dblclick', onDblClick);
+
+function getPos(e) {
+  const r = cv.getBoundingClientRect();
+  return { x: (e.clientX - r.left) * (W / r.width), y: (e.clientY - r.top) * (H / r.height) };
+}
+
+function onMouseDown(e) {
+  const { x, y } = getPos(e);
+  if (tool === 'select') {
+    // Check handle first
+    if (selectedId !== null) {
+      const s = shapes.find(sh => sh.id === selectedId);
+      if (s) {
+        const handle = hitHandle(s, x, y);
+        if (handle) {
+          resizing = true;
+          resizeHandle = handle;
+          saveHistory();
+          return;
+        }
+      }
+    }
+    // Hit test
+    const hit = hitTest(x, y);
+    if (hit) {
+      selectedId = hit.id;
+      dragging = true;
+      dragOffX = x - hit.x;
+      dragOffY = y - hit.y;
+      saveHistory();
+    } else {
+      selectedId = null;
+    }
+    updatePropsPanel();
+    render();
+    return;
+  }
+
+  if (tool === 'text') {
+    showTextInput(x, y);
+    return;
+  }
+
+  saveHistory();
+  drawing = true;
+  startX = x; startY = y;
+  const sw = parseInt(document.getElementById('stroke-width').value) || 2;
+  const ff = document.getElementById('font-family').value;
+  const fs = parseInt(document.getElementById('font-size').value) || 18;
+  const shape = {
+    id: idCounter++, type: tool,
+    x, y, w: 0, h: 0,
+    fill: fillNone ? null : fillColor,
+    fillNone,
+    stroke: strokeColor,
+    strokeW: sw,
+    fontFamily: ff, fontSize: fs,
+    text: ''
+  };
+  shapes.push(shape);
+  selectedId = shape.id;
+}
+
+function onMouseMove(e) {
+  const { x, y } = getPos(e);
+  document.getElementById('status-pos').textContent = `x: ${Math.round(x)}  y: ${Math.round(y)}`;
+
+  if (resizing && selectedId !== null) {
+    const s = shapes.find(sh => sh.id === selectedId);
+    if (s) resizeShape(s, resizeHandle, x, y);
+    render(); return;
+  }
+
+  if (dragging && selectedId !== null) {
+    const s = shapes.find(sh => sh.id === selectedId);
+    if (s) { s.x = x - dragOffX; s.y = y - dragOffY; }
+    render(); return;
+  }
+
+  if (!drawing) {
+    if (tool === 'select' && selectedId !== null) {
+      const s = shapes.find(sh => sh.id === selectedId);
+      if (s && hitHandle(s, x, y)) cv.style.cursor = 'se-resize';
+      else cv.style.cursor = 'default';
+    }
+    return;
+  }
+
+  const s = shapes[shapes.length - 1];
+  if (!s) return;
+  s.w = x - startX; s.h = y - startY;
+  if (s.type === 'line') { s.x2 = x; s.y2 = y; }
+  render();
+}
+
+function onMouseUp() {
+  drawing = false; dragging = false; resizing = false;
+  updateLayers(); updatePropsPanel();
+}
+
+function onDblClick(e) {
+  if (tool !== 'select') return;
+  const { x, y } = getPos(e);
+  const hit = hitTest(x, y);
+  if (hit && hit.type === 'text') {
+    showTextInput(hit.x, hit.y, hit.id, hit.text);
+  }
+}
+
+// ─── Hit test ─────────────────────────────────────────────
+function hitTest(x, y) {
+  for (let i = shapes.length - 1; i >= 0; i--) {
+    const s = shapes[i];
+    if (s.type === 'rect' || s.type === 'text') {
+      const x0 = Math.min(s.x, s.x + s.w), y0 = Math.min(s.y, s.y + s.h);
+      const w = Math.abs(s.w || 200), h = Math.abs(s.h || 40);
+      if (x >= x0 && x <= x0 + w && y >= y0 && y <= y0 + h) return s;
+    } else if (s.type === 'circle') {
+      const cx = s.x + s.w / 2, cy = s.y + s.h / 2;
+      const rx = Math.abs(s.w / 2), ry = Math.abs(s.h / 2);
+      if (rx > 0 && ry > 0 && ((x-cx)/rx)**2 + ((y-cy)/ry)**2 <= 1) return s;
+    } else if (s.type === 'line') {
+      const d = distToSegment(x, y, s.x, s.y, s.x2 || s.x, s.y2 || s.y);
+      if (d < 8) return s;
+    }
+  }
+  return null;
+}
+
+function hitHandle(s, x, y) {
+  if (s.type === 'line') return null;
+  const x1 = s.x + s.w, y1 = s.y + s.h;
+  if (Math.abs(x - x1) < HANDLE_SIZE && Math.abs(y - y1) < HANDLE_SIZE) return 'se';
+  return null;
+}
+
+function resizeShape(s, handle, x, y) {
+  if (handle === 'se') { s.w = x - s.x; s.h = y - s.y; }
+}
+
+function distToSegment(px, py, x1, y1, x2, y2) {
+  const dx = x2 - x1, dy = y2 - y1;
+  const len2 = dx * dx + dy * dy;
+  if (len2 === 0) return Math.hypot(px - x1, py - y1);
+  const t = Math.max(0, Math.min(1, ((px - x1) * dx + (py - y1) * dy) / len2));
+  return Math.hypot(px - x1 - t * dx, py - y1 - t * dy);
+}
+
+// ─── Render ───────────────────────────────────────────────
+function render() {
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, W, H);
+
+  shapes.forEach(s => drawShape(s, s.id === selectedId));
+}
+
+function drawShape(s, selected) {
+  ctx.save();
+  ctx.lineWidth = s.strokeW || 2;
+  ctx.strokeStyle = s.stroke || '#000';
+
+  if (s.type === 'rect') {
+    const x = s.x, y = s.y, w = s.w, h = s.h;
+    if (!s.fillNone) { ctx.fillStyle = s.fill || '#fff'; ctx.fillRect(x, y, w, h); }
+    if (s.strokeW > 0) ctx.strokeRect(x, y, w, h);
+  } else if (s.type === 'circle') {
+    const cx = s.x + s.w / 2, cy = s.y + s.h / 2;
+    const rx = Math.abs(s.w / 2), ry = Math.abs(s.h / 2);
+    ctx.beginPath();
+    ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
+    if (!s.fillNone) { ctx.fillStyle = s.fill || '#fff'; ctx.fill(); }
+    if (s.strokeW > 0) ctx.stroke();
+  } else if (s.type === 'line') {
+    ctx.beginPath();
+    ctx.moveTo(s.x, s.y);
+    ctx.lineTo(s.x2 || s.x, s.y2 || s.y);
+    ctx.stroke();
+  } else if (s.type === 'text') {
+    ctx.font = `${s.fontSize || 18}px "${s.fontFamily || 'Georgia'}"`;
+    ctx.fillStyle = s.fill || '#000';
+    ctx.fillText(s.text || '', s.x, s.y + (s.fontSize || 18));
+    // bounding box
+    const tw = ctx.measureText(s.text || '').width;
+    s.w = tw || 100; s.h = s.fontSize + 8;
+  }
+
+  // Selection handles
+  if (selected && s.type !== 'line') {
+    const x0 = s.x, y0 = s.y, w = s.w, h = s.h;
+    ctx.setLineDash([4, 3]);
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = '#0088ff';
+    ctx.strokeRect(x0, y0, w, h);
+    ctx.setLineDash([]);
+    // SE handle
+    ctx.fillStyle = '#0088ff';
+    ctx.fillRect(x0 + w - HANDLE_SIZE/2, y0 + h - HANDLE_SIZE/2, HANDLE_SIZE, HANDLE_SIZE);
+  }
+
+  ctx.restore();
+}
+
+// ─── Text input ───────────────────────────────────────────
+let editingTextId = null;
+
+function showTextInput(cx, cy, id, existing) {
+  const overlay = document.getElementById('text-input-overlay');
+  const field = document.getElementById('text-field');
+  const rect = cv.getBoundingClientRect();
+  const scaleX = rect.width / W;
+  const scaleY = rect.height / H;
+  overlay.style.display = 'flex';
+  overlay.style.left = (rect.left + cx * scaleX) + 'px';
+  overlay.style.top = (rect.top + cy * scaleY - 10) + 'px';
+  field.value = existing || '';
+  field.focus();
+  textPending = { x: cx, y: cy };
+  editingTextId = id || null;
+  field.onkeydown = (e) => { if (e.key === 'Enter') confirmText(); if (e.key === 'Escape') cancelText(); };
+}
+
+function confirmText() {
+  const val = document.getElementById('text-field').value.trim();
+  const overlay = document.getElementById('text-input-overlay');
+  overlay.style.display = 'none';
+  if (!val) return;
+  const ff = document.getElementById('font-family').value;
+  const fs = parseInt(document.getElementById('font-size').value) || 18;
+  if (editingTextId !== null) {
+    const s = shapes.find(x => x.id === editingTextId);
+    if (s) { s.text = val; s.fontFamily = ff; s.fontSize = fs; }
+  } else {
+    saveHistory();
+    shapes.push({
+      id: idCounter++, type: 'text',
+      x: textPending.x, y: textPending.y, w: 100, h: fs + 8,
+      fill: strokeColor, fillNone: false,
+      stroke: 'transparent', strokeW: 0,
+      fontFamily: ff, fontSize: fs, text: val
+    });
+  }
+  textPending = null; editingTextId = null;
+  render(); updateLayers();
+}
+
+function cancelText() {
+  document.getElementById('text-input-overlay').style.display = 'none';
+  textPending = null; editingTextId = null;
+}
+
+// ─── History ──────────────────────────────────────────────
+function saveHistory() {
+  history.push(JSON.parse(JSON.stringify(shapes)));
+  if (history.length > 40) history.shift();
+}
+
+function undo() {
+  if (!history.length) return;
+  shapes = history.pop();
+  selectedId = null;
+  render(); updateLayers(); updatePropsPanel();
+}
+
+function clearCanvas() {
+  if (!shapes.length) return;
+  if (!confirm('Limpar tudo?')) return;
+  saveHistory();
+  shapes = []; selectedId = null;
+  render(); updateLayers(); updatePropsPanel();
+}
+
+// ─── Presets ──────────────────────────────────────────────
+function addPreset(type) {
+  saveHistory();
+  const sw = parseInt(document.getElementById('stroke-width').value) || 2;
+  const presets = {
+    frame: { type:'rect', x:20, y:20, w:W-40, h:H-40, fill:null, fillNone:true, stroke:'#0d1b2e', strokeW:3 },
+    photo: { type:'rect', x:60, y:60, w:200, h:240, fill:'#e8e8e8', fillNone:false, stroke:'#888', strokeW:1 },
+    badge: { type:'circle', x:W/2-60, y:60, w:120, h:120, fill:'#e8e8e8', fillNone:false, stroke:'#0d1b2e', strokeW:2 },
+    title: { type:'text', x:W/2-150, y:H-200, w:300, h:30, fill:'#0d1b2e', fillNone:false, stroke:'transparent', strokeW:0, fontFamily:'Cinzel', fontSize:22, text:'LEGADO NAVAL' },
+    subtitle: { type:'text', x:W/2-120, y:100, w:240, h:28, fill:'#0d1b2e', fillNone:false, stroke:'transparent', strokeW:0, fontFamily:'Cinzel', fontSize:18, text:'Nome / Patente' },
+    dates: { type:'text', x:W/2-100, y:140, w:200, h:22, fill:'#444', fillNone:false, stroke:'transparent', strokeW:0, fontFamily:'Crimson Text', fontSize:16, text:'2000 – 2020' },
+    divider: { type:'line', x:60, y:H/2, y2:H/2, x2:W-60, fill:null, fillNone:true, stroke:'#c9a84c', strokeW:1.5 },
+    logo: { type:'text', x:W/2-80, y:H-50, w:160, h:20, fill:'#c9a84c', fillNone:false, stroke:'transparent', strokeW:0, fontFamily:'Cinzel', fontSize:13, text:'Arsenal Naval' },
+  };
+  const p = presets[type];
+  if (!p) return;
+  shapes.push({ id: idCounter++, ...p });
+  selectedId = shapes[shapes.length-1].id;
+  render(); updateLayers(); updatePropsPanel();
+}
+
+// ─── Layers panel ─────────────────────────────────────────
+function updateLayers() {
+  const list = document.getElementById('layers-list');
+  list.innerHTML = '';
+  const icons = { rect:'▭', circle:'◯', line:'╱', text:'T' };
+  [...shapes].reverse().forEach(s => {
+    const div = document.createElement('div');
+    div.className = 'layer-item' + (s.id === selectedId ? ' selected' : '');
+    div.innerHTML = `<span class="layer-icon">${icons[s.type]||'?'}</span>
+      <span class="layer-name">${s.text || s.type}</span>
+      <span class="layer-del" onclick="deleteShape(${s.id},event)">✕</span>`;
+    div.onclick = () => { selectedId = s.id; render(); updateLayers(); updatePropsPanel(); };
+    list.appendChild(div);
+  });
+}
+
+function deleteShape(id, e) {
+  e.stopPropagation();
+  saveHistory();
+  shapes = shapes.filter(s => s.id !== id);
+  if (selectedId === id) selectedId = null;
+  render(); updateLayers(); updatePropsPanel();
+}
+
+// ─── Properties panel ─────────────────────────────────────
+function updatePropsPanel() {
+  const sec = document.getElementById('props-section');
+  const content = document.getElementById('props-content');
+  const s = shapes.find(sh => sh.id === selectedId);
+
+  if (!s) { sec.style.display = 'none'; document.getElementById('status-sel').textContent = 'Nenhum elemento selecionado'; return; }
+  sec.style.display = 'block';
+  document.getElementById('status-sel').textContent = `Selecionado: ${s.text || s.type} (id ${s.id})`;
+
+  let html = '';
+  html += `<div class="prop-row"><span class="prop-label">X</span><input class="prop-input" type="number" value="${Math.round(s.x)}" onchange="setProp(${s.id},'x',+this.value)"></div>`;
+  html += `<div class="prop-row"><span class="prop-label">Y</span><input class="prop-input" type="number" value="${Math.round(s.y)}" onchange="setProp(${s.id},'y',+this.value)"></div>`;
+  if (s.type !== 'line') {
+    html += `<div class="prop-row"><span class="prop-label">W</span><input class="prop-input" type="number" value="${Math.round(s.w)}" onchange="setProp(${s.id},'w',+this.value)"></div>`;
+    html += `<div class="prop-row"><span class="prop-label">H</span><input class="prop-input" type="number" value="${Math.round(s.h)}" onchange="setProp(${s.id},'h',+this.value)"></div>`;
+  }
+  if (s.type !== 'text') {
+    html += `<div class="prop-row"><span class="prop-label">Contorno</span><input class="prop-color" type="color" value="${s.stroke||'#000'}" onchange="setProp(${s.id},'stroke',this.value)"></div>`;
+    html += `<div class="prop-row"><span class="prop-label">Esp.</span><input class="prop-input" type="number" value="${s.strokeW||1}" min="0" max="20" onchange="setProp(${s.id},'strokeW',+this.value)"></div>`;
+  }
+  if (s.type !== 'line') {
+    html += `<div class="prop-row"><span class="prop-label">Fundo</span><input class="prop-color" type="color" value="${s.fill||'#ffffff'}" onchange="setProp(${s.id},'fill',this.value)"></div>`;
+  }
+  if (s.type === 'text') {
+    html += `<div class="prop-row"><span class="prop-label">Cor</span><input class="prop-color" type="color" value="${s.fill||'#000'}" onchange="setProp(${s.id},'fill',this.value)"></div>`;
+    html += `<div class="prop-row"><span class="prop-label">Tam.</span><input class="prop-input" type="number" value="${s.fontSize||18}" onchange="setPropStr(${s.id},'fontSize',+this.value)"></div>`;
+    html += `<div class="prop-row"><span class="prop-label">Fonte</span>
+      <select class="prop-input" onchange="setPropStr(${s.id},'fontFamily',this.value)">
+        ${['Cinzel','Crimson Text','Georgia','Arial','Courier New'].map(f=>`<option value="${f}"${f===s.fontFamily?' selected':''}>${f}</option>`).join('')}
+      </select></div>`;
+  }
+  // Move up/down
+  html += `<div style="display:flex;gap:4px;margin-top:6px">
+    <button class="action-btn" style="margin:0;flex:1" onclick="moveLayer(${s.id},-1)">▲ Acima</button>
+    <button class="action-btn" style="margin:0;flex:1" onclick="moveLayer(${s.id},1)">▼ Abaixo</button>
+  </div>`;
+  html += `<button class="action-btn danger" style="margin-top:4px" onclick="deleteShape(${s.id},{stopPropagation:()=>{}})">✕ Remover</button>`;
+
+  content.innerHTML = html;
+}
+
+function setProp(id, key, val) {
+  const s = shapes.find(sh => sh.id === id);
+  if (s) { s[key] = val; render(); }
+}
+
+function setPropStr(id, key, val) {
+  const s = shapes.find(sh => sh.id === id);
+  if (s) { s[key] = val; render(); }
+}
+
+function moveLayer(id, dir) {
+  const i = shapes.findIndex(s => s.id === id);
+  if (i < 0) return;
+  const ni = i + dir;
+  if (ni < 0 || ni >= shapes.length) return;
+  [shapes[i], shapes[ni]] = [shapes[ni], shapes[i]];
+  render(); updateLayers();
+}
+
+// ─── Export ───────────────────────────────────────────────
+function exportPNG() {
+  const sel = selectedId;
+  selectedId = null;
+  render();
+  const link = document.createElement('a');
+  link.download = 'layout-naval.png';
+  link.href = cv.toDataURL('image/png');
+  link.click();
+  selectedId = sel;
+  render();
+}
+
+function shareLayout() {
+  const json = JSON.stringify(shapes);
+  const encoded = btoa(encodeURIComponent(json));
+  const url = location.href.split('?')[0] + '?layout=' + encoded;
+  navigator.clipboard.writeText(url).then(() => alert('Link copiado!')).catch(() => prompt('Copie o link:', url));
+}
+
+// Load from URL
+(function loadFromURL() {
+  const params = new URLSearchParams(location.search);
+  const raw = params.get('layout');
+  if (raw) {
+    try {
+      shapes = JSON.parse(decodeURIComponent(atob(raw)));
+      idCounter = Math.max(...shapes.map(s => s.id), 0) + 1;
+      render(); updateLayers();
+    } catch(e) { console.warn('Layout inválido na URL'); }
+  }
+})();
+
+// ─── Keyboard shortcuts ───────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (['INPUT','SELECT','TEXTAREA'].includes(e.target.tagName)) return;
+  const map = { v:'select', r:'rect', c:'circle', l:'line', t:'text' };
+  if (map[e.key]) setTool(map[e.key]);
+  if ((e.ctrlKey || e.metaKey) && e.key === 'z') { e.preventDefault(); undo(); }
+  if (e.key === 'Delete' || e.key === 'Backspace') {
+    if (selectedId !== null) { deleteShape(selectedId, { stopPropagation: ()=>{} }); }
+  }
+  if (e.key === 'ArrowUp' && selectedId !== null) { const s = shapes.find(x=>x.id===selectedId); if(s) { s.y -= e.shiftKey?10:1; render(); } }
+  if (e.key === 'ArrowDown' && selectedId !== null) { const s = shapes.find(x=>x.id===selectedId); if(s) { s.y += e.shiftKey?10:1; render(); } }
+  if (e.key === 'ArrowLeft' && selectedId !== null) { const s = shapes.find(x=>x.id===selectedId); if(s) { s.x -= e.shiftKey?10:1; render(); } }
+  if (e.key === 'ArrowRight' && selectedId !== null) { const s = shapes.find(x=>x.id===selectedId); if(s) { s.x += e.shiftKey?10:1; render(); } }
+});
+
+function updateStatusBar() {
+  document.getElementById('status-size').textContent = `Canvas: ${W} × ${H}`;
+}
+
+// Initial render
+render();
+</script>
+
+</body>
+</html>
